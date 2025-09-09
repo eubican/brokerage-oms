@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: oms
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: validate

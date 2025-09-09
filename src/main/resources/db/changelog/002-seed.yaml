@@ -1,0 +1,62 @@
+# src/main/resources/db/changelog/002-seed.yaml
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed
+      author: eubican
+      changes:
+        - insert:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: email
+                  value: "demo@example.com"
+              - column:
+                  name: name
+                  value: "Demo User"
+
+        - insert:
+            tableName: asset
+            columns:
+              - column:
+                  name: customer_id
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: asset_name
+                  value: "TRY"
+              - column:
+                  name: size
+                  valueNumeric: 100000.00
+              - column:
+                  name: usable_size
+                  valueNumeric: 100000.00
+              - column:
+                  name: reserved_size
+                  valueNumeric: 0
+              - column:
+                  name: version
+                  valueNumeric: 0
+
+        - insert:
+            tableName: asset
+            columns:
+              - column:
+                  name: customer_id
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: asset_name
+                  value: "XYZ"
+              - column:
+                  name: size
+                  valueNumeric: 100
+              - column:
+                  name: usable_size
+                  valueNumeric: 100
+              - column:
+                  name: reserved_size
+                  valueNumeric: 0
+              - column:
+                  name: version
+                  valueNumeric: 0
