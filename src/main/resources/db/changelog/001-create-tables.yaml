@@ -1,3 +1,4 @@
+# src/main/resources/db/changelog/001-create-tables.yaml
 databaseChangeLog:
   - changeSet:
       id: 001-create-tables
@@ -45,6 +46,11 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: usable_size
+                  type: "DECIMAL(32,6)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reserved_size
                   type: "DECIMAL(32,6)"
                   constraints:
                     nullable: false

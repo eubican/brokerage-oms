@@ -1,5 +1,6 @@
 package com.eubican.practices.brokerage.oms.web.dto;
 
+import com.eubican.practices.brokerage.oms.domain.model.Order;
 import com.eubican.practices.brokerage.oms.domain.model.OrderSide;
 import com.eubican.practices.brokerage.oms.domain.model.OrderStatus;
 
@@ -17,4 +18,15 @@ public record OrderResponse(
         BigDecimal price,
         Instant createdAt
 ) {
+    public static OrderResponse of(Order order) {
+        return new OrderResponse(order.getId(),
+                order.getCustomerId(),
+                order.getAssetName(),
+                order.getStatus(),
+                order.getSide(),
+                order.getSize(),
+                order.getPrice(),
+                order.getCreatedAt()
+        );
+    }
 }
