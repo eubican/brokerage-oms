@@ -28,13 +28,12 @@ class OrderFlowIT {
     private static final UUID CUSTOMER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     @Test
-    void assetsSeedAndInvariant() {
+    void verifyCashInitialStateAndBalanceInvariant() {
         Asset cash = assetService.retrieveCustomerAsset(CUSTOMER_ID, "TRY");
 
         Assertions.assertThat(cash.getUsable()).isGreaterThan(BigDecimal.ZERO);
         Assertions.assertThat(cash.getReserved()).isZero();
-        Assertions.assertThat(cash.getSize()).isEqualByComparingTo(cash.getUsable().add(cash.getReserved())
-        );
+        Assertions.assertThat(cash.getSize()).isEqualByComparingTo(cash.getUsable().add(cash.getReserved()));
     }
 
     @Test
