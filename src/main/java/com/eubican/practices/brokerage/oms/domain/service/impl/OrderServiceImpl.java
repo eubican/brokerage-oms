@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -84,7 +85,7 @@ class OrderServiceImpl implements OrderService {
         OrderEntity entity = orderRepository.findById(orderID)
                 .orElseThrow(() -> {
                     log.warn("Order {} not found", orderID);
-                    return new IllegalArgumentException("Order not found");
+                    return new NoSuchElementException("Order not found");
                 });
 
         if (OrderStatus.PENDING != entity.getStatus()) {

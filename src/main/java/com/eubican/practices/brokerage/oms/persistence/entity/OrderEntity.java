@@ -28,10 +28,10 @@ public class OrderEntity {
     @Column(name = "side", nullable = false)
     private OrderSide side;
 
-    @Column(name = "size", nullable = false, precision = 32, scale = 4)
+    @Column(name = "size", nullable = false, precision = 32, scale = 6)
     private BigDecimal size;
 
-    @Column(name = "price", nullable = false, precision = 32, scale = 6)
+    @Column(name = "price", nullable = false, precision = 32, scale = 4)
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -41,7 +42,7 @@ class AssetServiceImpl implements AssetService {
                 .map(Asset::from)
                 .orElseThrow(() -> {
                     log.warn("Asset {} not found for customer {}", assetName, customerId);
-                    return new IllegalArgumentException(assetName + " asset not found");
+                    return new NoSuchElementException(assetName + " asset not found");
                 });
     }
 
