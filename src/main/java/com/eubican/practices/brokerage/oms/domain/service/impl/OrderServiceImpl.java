@@ -40,7 +40,7 @@ class OrderServiceImpl implements OrderService {
                 BigDecimal neededTRY = order.getPrice().multiply(order.getSize());
                 Asset cash = assetService.retrieveCustomerAsset(order.getCustomerId(), "TRY");
 
-                if (cash.verifyUsable(neededTRY)) {
+                if (cash.hasInsufficientFunds(neededTRY)) {
                     log.warn("Insufficient TRY usable balance to place BUY for customer {}", order.getCustomerId());
                     throw new IllegalArgumentException("Insufficient TRY usable balance to place BUY");
                 }
@@ -51,7 +51,7 @@ class OrderServiceImpl implements OrderService {
             } else {
                 Asset asset = assetService.retrieveCustomerAsset(order.getCustomerId(), order.getAssetName());
 
-                if (asset.verifyUsable(order.getSize())) {
+                if (asset.hasInsufficientFunds(order.getSize())) {
                     log.warn("Insufficient {} usable balance to place BUY for customer {}", order.getAssetName(), order.getCustomerId());
                     throw new IllegalArgumentException("Insufficient " + order.getAssetName() + " usable balance to place BUY");
                 }

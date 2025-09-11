@@ -56,7 +56,7 @@ public final class Asset {
         );
     }
 
-    public boolean verifyUsable(BigDecimal needed) {
+    public boolean hasInsufficientFunds(BigDecimal needed) {
         return usable.compareTo(needed) < 0;
     }
 
