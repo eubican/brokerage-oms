@@ -31,7 +31,7 @@ public class OrderController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(required = false) String assetName,
-            @PageableDefault(sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         var page = orderService.fetchOrders(customerId, from, to, status, assetName, pageable)
                 .map(OrderResponse::of);
