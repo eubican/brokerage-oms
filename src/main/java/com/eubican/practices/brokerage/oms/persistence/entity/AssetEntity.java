@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 @Entity
@@ -40,4 +41,17 @@ public class AssetEntity {
     @Version
     private Long version;
 
+    @PrePersist
+    @PreUpdate
+    private void normalizeAndSyncSize() {
+        if (usable == null) {
+            usable = BigDecimal.ZERO;
+        }
+        if (reserved == null) {
+            reserved = BigDecimal.ZERO;
+        }
+        usable = usable.setScale(6, RoundingMode.HALF_UP);
+        reserved = reserved.setScale(6, RoundingMode.HALF_UP);
+        size = usable.add(reserved).setScale(6, RoundingMode.HALF_UP);
+    }
 }
