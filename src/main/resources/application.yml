@@ -6,6 +6,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  security:
+    # should be passed with env variables
+    user:
+      name: ""
+      password: ""
+      roles: [ ]
 
 management:
   endpoints:
