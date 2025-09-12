@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 public final class Asset {
 
-    private final Long id;
+    private final UUID id;
 
     private final UUID customerId;
 
@@ -26,7 +26,7 @@ public final class Asset {
     private BigDecimal reserved;
 
     //todo can we use annotations?
-    private Asset(Long id,
+    private Asset(UUID id,
                   UUID customerId,
                   String assetName,
                   BigDecimal size,

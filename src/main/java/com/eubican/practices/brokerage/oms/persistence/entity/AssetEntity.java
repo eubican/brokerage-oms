@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -16,8 +17,8 @@ import java.util.UUID;
 public class AssetEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
 
     @Column(name = "customer_id", nullable = false, columnDefinition = "UUID")
@@ -41,9 +42,15 @@ public class AssetEntity {
     @Version
     private Long version;
 
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
     @PrePersist
     @PreUpdate
     private void normalizeAndSyncSize() {
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
         if (usable == null) {
             usable = BigDecimal.ZERO;
         }
