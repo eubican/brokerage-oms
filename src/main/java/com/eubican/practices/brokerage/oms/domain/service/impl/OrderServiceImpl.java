@@ -1,5 +1,6 @@
 package com.eubican.practices.brokerage.oms.domain.service.impl;
 
+import com.eubican.practices.brokerage.oms.domain.exception.OrderNotCancellableException;
 import com.eubican.practices.brokerage.oms.domain.model.Asset;
 import com.eubican.practices.brokerage.oms.domain.model.Order;
 import com.eubican.practices.brokerage.oms.domain.model.OrderSide;
@@ -18,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.NoSuchElementException;
+
+import com.eubican.practices.brokerage.oms.domain.exception.ResourceNotFoundException;
+
 import java.util.UUID;
 
 @Slf4j
@@ -85,12 +88,12 @@ class OrderServiceImpl implements OrderService {
         OrderEntity entity = orderRepository.findById(orderID)
                 .orElseThrow(() -> {
                     log.warn("Order {} not found", orderID);
-                    return new NoSuchElementException("Order not found");
+                    return new ResourceNotFoundException(String.format("Order %s not found", orderID));
                 });
 
         if (OrderStatus.PENDING != entity.getStatus()) {
             log.warn("Order {} cannot be canceled because it is in status {}", orderID, entity.getStatus());
-            throw new IllegalStateException("Only PENDING orders can be canceled");
+            throw new OrderNotCancellableException("Only PENDING orders can be canceled");
         }
 
         retrying(() -> {

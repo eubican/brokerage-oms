@@ -1,5 +1,6 @@
 package com.eubican.practices.brokerage.oms.web.advice;
 
+import com.eubican.practices.brokerage.oms.domain.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -7,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -37,9 +36,9 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(status.value(), status.getReasonPhrase(), msg, req.getRequestURI()));
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ApiError> notFound(NoSuchElementException ex, HttpServletRequest req) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ApiError> application(ApplicationException ex, HttpServletRequest req) {
+        HttpStatus status = ex.getStatus();
         return ResponseEntity.status(status)
                 .body(ApiError.of(status.value(), status.getReasonPhrase(), ex.getMessage(), req.getRequestURI()));
     }

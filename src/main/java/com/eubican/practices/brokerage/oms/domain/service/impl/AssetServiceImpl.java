@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import com.eubican.practices.brokerage.oms.domain.exception.ResourceNotFoundException;
 
 @Slf4j
 @Service
@@ -48,7 +48,7 @@ class AssetServiceImpl implements AssetService {
                 .map(Asset::from)
                 .orElseThrow(() -> {
                     log.warn("Asset {} not found for customer {}", assetName, customerId);
-                    return new NoSuchElementException(assetName + " asset not found");
+                    return new ResourceNotFoundException(assetName + " asset not found");
                 });
     }
 
