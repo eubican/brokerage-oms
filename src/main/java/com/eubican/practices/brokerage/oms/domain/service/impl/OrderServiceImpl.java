@@ -9,6 +9,7 @@ import com.eubican.practices.brokerage.oms.domain.service.AssetService;
 import com.eubican.practices.brokerage.oms.domain.service.OrderService;
 import com.eubican.practices.brokerage.oms.persistence.entity.OrderEntity;
 import com.eubican.practices.brokerage.oms.persistence.repository.OrderJpaRepository;
+import com.eubican.practices.brokerage.oms.security.AuthorizationGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -35,6 +36,8 @@ class OrderServiceImpl implements OrderService {
     private final OrderJpaRepository orderRepository;
 
     private final AssetService assetService;
+
+    private final AuthorizationGuard authorizationGuard;
 
     @Override
     @Transactional
@@ -90,6 +93,9 @@ class OrderServiceImpl implements OrderService {
                     log.warn("Order {} not found", orderID);
                     return new ResourceNotFoundException(String.format("Order %s not found", orderID));
                 });
+
+        // Enforce authorization: only admin or owner can cancel
+        authorizationGuard.checkCustomerAccess(entity.getCustomerId());
 
         if (OrderStatus.PENDING != entity.getStatus()) {
             log.warn("Order {} cannot be canceled because it is in status {}", orderID, entity.getStatus());

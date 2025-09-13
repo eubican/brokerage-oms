@@ -15,10 +15,26 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: email
-                  type: VARCHAR(255)
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+                    unique: true
               - column:
-                  name: name
-                  type: VARCHAR(255)
+                  name: role
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password_hash
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
 
         - createTable:
             tableName: asset
@@ -111,5 +127,6 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
                   constraints:
                     nullable: false

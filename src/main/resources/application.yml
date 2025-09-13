@@ -6,12 +6,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-  security:
-    # should be passed with env variables
-    user:
-      name: ""
-      password: ""
-      roles: [ ]
 
 management:
   endpoints:
@@ -23,3 +17,11 @@ management:
       probes:
         enabled: true
       show-details: when_authorized
+
+application:
+  # should be passed with env variables
+  security:
+    admin-user: ""
+    admin-password: ""
+    jwt-secret: ""
+    jwt-ttl-seconds: 3600

@@ -12,10 +12,13 @@ databaseChangeLog:
                   value: "00000000-0000-0000-0000-000000000001"
               - column:
                   name: email
-                  value: "demo@example.com"
+                  value: "admin@example.com"
               - column:
-                  name: name
-                  value: "Demo User"
+                  name: role
+                  value: "ROLE_ADMIN"
+              - column:
+                  name: password_hash
+                  value: "$2b$10$H.O..OTqi/zbRSRDdyklkujdkObG4IWcMGdigF6NI0YXpwc7QjR2y" # bcrytped password
 
         - insert:
             tableName: asset
@@ -60,6 +63,47 @@ databaseChangeLog:
               - column:
                   name: usable_size
                   valueNumeric: 100
+              - column:
+                  name: reserved_size
+                  valueNumeric: 0
+              - column:
+                  name: version
+                  valueNumeric: 0
+
+        - insert:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000002"
+              - column:
+                  name: email
+                  value: "user@example.com"
+              - column:
+                  name: role
+                  value: "ROLE_CUSTOMER"
+              - column:
+                  name: password_hash
+                  value: "$2b$10$tHaqI/xlJFTkNQXHvHBy4.UIQXF97iMc67S9jha6ko8sEol6G72sG" # bcrytped password
+
+        - insert:
+            tableName: asset
+            columns:
+              - column:
+                  name: id
+                  value: "33333333-3333-3333-3333-333333333333"
+              - column:
+                  name: customer_id
+                  value: "00000000-0000-0000-0000-000000000002"
+              - column:
+                  name: asset_name
+                  value: "TRY"
+              - column:
+                  name: size
+                  valueNumeric: 100000.00
+              - column:
+                  name: usable_size
+                  valueNumeric: 100000.00
               - column:
                   name: reserved_size
                   valueNumeric: 0

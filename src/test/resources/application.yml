@@ -8,3 +8,8 @@ spring:
       name: test
       password: test
       roles: ADMIN
+
+application:
+  security:
+    jwt-secret: test-secret-for-it-should-be-at-least-32-bytes-long!!!
+    jwt-ttl-seconds: 3600

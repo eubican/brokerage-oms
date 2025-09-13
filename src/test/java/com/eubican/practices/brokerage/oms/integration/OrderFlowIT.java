@@ -7,9 +7,13 @@ import com.eubican.practices.brokerage.oms.domain.model.OrderStatus;
 import com.eubican.practices.brokerage.oms.domain.service.AssetService;
 import com.eubican.practices.brokerage.oms.domain.service.OrderService;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -26,6 +30,18 @@ class OrderFlowIT {
     OrderService orderService;
 
     private static final UUID CUSTOMER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
+    @BeforeEach
+    void setAdminAuth() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new TestingAuthenticationToken("admin", "password", "ROLE_ADMIN")
+        );
+    }
+
+    @AfterEach
+    void clearAuth() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void verifyCashInitialStateAndBalanceInvariant() {
