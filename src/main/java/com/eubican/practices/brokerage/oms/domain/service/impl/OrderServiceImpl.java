@@ -163,6 +163,81 @@ class OrderServiceImpl implements OrderService {
         return ordersPage.map(Order::from);
     }
 
+    @Override
+    @Transactional
+    public void matchOrder(UUID orderID) {
+        OrderEntity entity = orderRepository.findById(orderID)
+                .orElseThrow(() -> {
+                    log.warn("Order {} not found", orderID);
+                    return new ResourceNotFoundException(String.format("Order %s not found", orderID));
+                });
+
+        if (OrderStatus.PENDING != entity.getStatus()) {
+            log.warn("Order {} cannot be matched because it is in status {}", orderID, entity.getStatus());
+            throw new IllegalArgumentException("Only PENDING orders can be matched");
+        }
+
+        retrying(() -> {
+            if (OrderSide.BUY == entity.getSide()) {
+                BigDecimal amountTRY = entity.getPrice().multiply(entity.getSize());
+
+                // Deduct reserved TRY (spend the cash)
+                Asset cash = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), "TRY");
+                if (cash.verifyReserved(amountTRY)) {
+                    log.warn("Inconsistent TRY reserved balance to match BUY for customer {}", entity.getCustomer().getId());
+                    throw new IllegalArgumentException("Inconsistent TRY reserved balance to match BUY");
+                }
+                cash.setReserved(cash.getReserved().subtract(amountTRY));
+                assetService.upsertAsset(cash);
+
+                // Credit bought asset as usable
+                try {
+                    Asset bought = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
+                    bought.setUsable(bought.getUsable().add(entity.getSize()));
+                    assetService.upsertAsset(bought);
+                } catch (ResourceNotFoundException rnfe) {
+                    Asset newAsset = Asset.from(
+                            entity.getCustomer().getId(),
+                            entity.getAssetName(),
+                            entity.getSize(),
+                            entity.getSize(),
+                            BigDecimal.ZERO
+                    );
+                    assetService.upsertAsset(newAsset);
+                }
+            } else { // SELL
+                // Deduct reserved units of the sold asset
+                Asset sold = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
+                if (sold.verifyReserved(entity.getSize())) {
+                    log.warn("Inconsistent {} reserved balance to match SELL for customer {}", entity.getAssetName(), entity.getCustomer().getId());
+                    throw new IllegalArgumentException("Inconsistent " + entity.getAssetName() + " reserved balance to match SELL");
+                }
+                sold.setReserved(sold.getReserved().subtract(entity.getSize()));
+                assetService.upsertAsset(sold);
+
+                // Credit TRY as usable
+                BigDecimal amountTRY = entity.getPrice().multiply(entity.getSize());
+                try {
+                    Asset cash = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), "TRY");
+                    cash.setUsable(cash.getUsable().add(amountTRY));
+                    assetService.upsertAsset(cash);
+                } catch (ResourceNotFoundException rnfe) {
+                    Asset newCash = Asset.from(
+                            entity.getCustomer().getId(),
+                            "TRY",
+                            amountTRY,
+                            amountTRY,
+                            BigDecimal.ZERO
+                    );
+                    assetService.upsertAsset(newCash);
+                }
+            }
+        });
+
+        entity.setStatus(OrderStatus.MATCHED);
+        // hibernate dirty checking will update the order on txn commit
+    }
+
     private void retrying(Runnable work) {
         OptimisticLockingFailureException last = null;
         for (int i = 0; i < MAX_RETRIES; i++) {

@@ -57,7 +57,7 @@ public class AuthorizationGuard {
         return false;
     }
 
-    public UUID resolveCurrentCustomerId(Authentication auth) {
+    private UUID resolveCurrentCustomerId(Authentication auth) {
         Object principal = auth.getPrincipal();
         if (principal instanceof Jwt jwt) {
             String sub = jwt.getSubject();

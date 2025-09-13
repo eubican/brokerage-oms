@@ -16,6 +16,6 @@ public interface OrderService {
 
     Page<Order> fetchOrders(UUID customerId, Instant from, Instant to, OrderStatus status, String assetName, Pageable pageable);
 
-    // Phase 2 (bonus): void matchOrder(UUID orderId);
+    void matchOrder(UUID orderId);
 
 }

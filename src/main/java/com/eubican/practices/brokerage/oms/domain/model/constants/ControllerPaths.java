@@ -8,6 +8,7 @@ public final class ControllerPaths {
 
     public static final String API_V_1_ORDERS = "/api/v1/orders";
 
+    public static final String API_V_1_ADMIN_ORDERS = "/api/v1/admin/orders";
 
     private ControllerPaths() {
         throw new AssertionError("Cannot instantiate utility class.");
