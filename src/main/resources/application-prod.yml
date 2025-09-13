@@ -1,11 +1,18 @@
 spring:
-  application:
-    name: oms
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+  profiles:
+    active: prod
   jpa:
     hibernate:
       ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
 
 management:
   endpoints:
@@ -17,6 +24,10 @@ management:
       probes:
         enabled: true
       show-details: when_authorized
+
+logging:
+  level:
+    root: INFO
 
 application:
   security:

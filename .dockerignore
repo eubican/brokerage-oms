@@ -1,0 +1,27 @@
+# Gradle
+.gradle
+build
+
+# IDEs
+.idea
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings
+out
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+
+# Node/npm leftovers
+node_modules

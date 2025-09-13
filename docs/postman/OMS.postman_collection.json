@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "1bac3325-7b77-4174-9199-e92d067ebf6d",
+		"name": "brokerage-oms",
+		"description": "Postman Collection for Brokerage Order Management System endpoint with pageable sorting examples. Configure variables:\n\n- username\n    \n- password\n    \n- order-id\n    \n- customer-id\n    \n- asset-name",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17388038"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"user@example.com\",\r\n    \"password\": \"user\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base-url}}/api/v1/auth/login",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actuator Health (no auth)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/actuator/health",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Orders",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/api/v1/orders?customerId={{customer-id}}&from=2025-09-01T00:00:00.000Z&to=2025-10-01T00:00:00.000Z&sort=createdAt,DESC",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					],
+					"query": [
+						{
+							"key": "customerId",
+							"value": "{{customer-id}}"
+						},
+						{
+							"key": "from",
+							"value": "2025-09-01T00:00:00.000Z"
+						},
+						{
+							"key": "to",
+							"value": "2025-10-01T00:00:00.000Z"
+						},
+						{
+							"key": "sort",
+							"value": "createdAt,DESC"
+						},
+						{
+							"key": "assetName",
+							"value": "{{asset-name}}",
+							"disabled": true
+						},
+						{
+							"key": "status",
+							"value": "PENDING",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customerId\": \"{{customer-id}}\",\r\n    \"assetName\": \"XYZ\",\r\n    \"side\": \"BUY\",\r\n    \"size\": 50.00,\r\n    \"price\": 0.0001\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base-url}}/api/v1/orders",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/api/v1/orders/{{order-id}}/cancel",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{order-id}}",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Customer All Assets",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/api/v1/assets?customerId={{customer-id}}&from=2025-09-12T00:00:00.000Z&to=2025-09-13T00:00:00.000Z&sort=createdAt,DESC",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assets"
+					],
+					"query": [
+						{
+							"key": "customerId",
+							"value": "{{customer-id}}"
+						},
+						{
+							"key": "from",
+							"value": "2025-09-12T00:00:00.000Z"
+						},
+						{
+							"key": "to",
+							"value": "2025-09-13T00:00:00.000Z"
+						},
+						{
+							"key": "sort",
+							"value": "createdAt,DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Asset By Name",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/api/v1/assets/{{asset-name}}?customerId={{customer-id}}",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assets",
+						"{{asset-name}}"
+					],
+					"query": [
+						{
+							"key": "customerId",
+							"value": "{{customer-id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "http::localhost:",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "admin",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "admin"
+		},
+		{
+			"key": "customer-id",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "order-id",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "asset-name",
+			"value": "TRY",
+			"type": "default"
+		},
+		{
+			"key": "bearer-token",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
