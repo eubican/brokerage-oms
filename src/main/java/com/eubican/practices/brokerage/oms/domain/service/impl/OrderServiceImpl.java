@@ -1,5 +1,6 @@
 package com.eubican.practices.brokerage.oms.domain.service.impl;
 
+import com.eubican.practices.brokerage.oms.config.properties.OrderServiceProperties;
 import com.eubican.practices.brokerage.oms.domain.exception.OrderNotCancellableException;
 import com.eubican.practices.brokerage.oms.domain.model.Asset;
 import com.eubican.practices.brokerage.oms.domain.model.Order;
@@ -32,9 +33,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class OrderServiceImpl implements OrderService {
 
-    //todo we'll make this configurational
-    private static final int MAX_RETRIES = 3;
-
     private final OrderJpaRepository orderRepository;
 
     private final AssetService assetService;
@@ -42,6 +40,8 @@ class OrderServiceImpl implements OrderService {
     private final AuthorizationGuard authorizationGuard;
 
     private final CustomerJpaRepository customerRepository;
+
+    private final OrderServiceProperties orderServiceProperties;
 
     @Override
     @Transactional
@@ -239,8 +239,16 @@ class OrderServiceImpl implements OrderService {
     }
 
     private void retrying(Runnable work) {
+        int maxRetries = orderServiceProperties.getOptimisticLockMaxRetries();
+        if (maxRetries <= 0) {
+            log.debug("No retries configured, running work directly");
+            work.run();
+            return;
+        }
+
+        log.debug("Running work with {} retries", maxRetries);
         OptimisticLockingFailureException last = null;
-        for (int i = 0; i < MAX_RETRIES; i++) {
+        for (int i = 0; i < maxRetries; i++) {
             try {
                 work.run();
                 return;

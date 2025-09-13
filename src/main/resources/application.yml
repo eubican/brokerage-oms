@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   application:
     name: oms
   liquibase:
@@ -19,6 +21,8 @@ management:
       show-details: when_authorized
 
 application:
+  order-service:
+    optimistic-lock-max-retries: 3
   security:
     # Values must be provided via environment variables or externalized config in prod
     admin-user: "${APP_ADMIN_USER:}"

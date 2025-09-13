@@ -30,6 +30,8 @@ logging:
     root: INFO
 
 application:
+  order-service:
+    optimistic-lock-max-retries: 3
   security:
     # Values must be provided via environment variables or externalized config in prod
     admin-user: "${APP_ADMIN_USER:}"
