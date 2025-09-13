@@ -3,7 +3,9 @@ package com.eubican.practices.brokerage.oms.domain.service.impl;
 import com.eubican.practices.brokerage.oms.domain.model.Asset;
 import com.eubican.practices.brokerage.oms.domain.service.AssetService;
 import com.eubican.practices.brokerage.oms.persistence.entity.AssetEntity;
+import com.eubican.practices.brokerage.oms.persistence.entity.CustomerEntity;
 import com.eubican.practices.brokerage.oms.persistence.repository.AssetJpaRepository;
+import com.eubican.practices.brokerage.oms.persistence.repository.CustomerJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
+
 import com.eubican.practices.brokerage.oms.domain.exception.ResourceNotFoundException;
 
 @Slf4j
@@ -22,14 +25,17 @@ class AssetServiceImpl implements AssetService {
 
     private final AssetJpaRepository assetRepository;
 
+    private final CustomerJpaRepository customerRepository;
+
     @Override
     @Transactional
     public void upsertAsset(Asset asset) {
-        AssetEntity entity = assetRepository.findByCustomerIdAndAssetName(asset.getCustomerId(), asset.getAssetName())
+        AssetEntity entity = assetRepository.findByCustomer_IdAndAssetName(asset.getCustomerId(), asset.getAssetName())
                 .orElseGet(() -> {
                     AssetEntity e = new AssetEntity();
-                    e.setCustomerId(asset.getCustomerId());
                     e.setAssetName(asset.getAssetName());
+                    CustomerEntity ref = customerRepository.getReferenceById(asset.getCustomerId());
+                    e.setCustomer(ref);
                     return e;
                 });
 
@@ -44,7 +50,7 @@ class AssetServiceImpl implements AssetService {
     @Override
     @Transactional(readOnly = true)
     public Asset retrieveCustomerAsset(UUID customerId, String assetName) {
-        return assetRepository.findByCustomerIdAndAssetName(customerId, assetName)
+        return assetRepository.findByCustomer_IdAndAssetName(customerId, assetName)
                 .map(Asset::from)
                 .orElseThrow(() -> {
                     log.warn("Asset {} not found for customer {}", assetName, customerId);
@@ -55,7 +61,7 @@ class AssetServiceImpl implements AssetService {
     @Override
     @Transactional(readOnly = true)
     public Page<Asset> fetchCustomerAssets(UUID customerId, Instant from, Instant to, int page, int size) {
-        Page<AssetEntity> assetsPage = assetRepository.findByCustomerIdAndCreatedAtBetween(
+        Page<AssetEntity> assetsPage = assetRepository.findByCustomer_IdAndCreatedAtBetween(
                 customerId,
                 from,
                 to,

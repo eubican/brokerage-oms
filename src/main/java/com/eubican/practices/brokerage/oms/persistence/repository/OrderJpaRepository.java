@@ -11,15 +11,15 @@ import java.util.UUID;
 
 public interface OrderJpaRepository extends JpaRepository<OrderEntity, UUID> {
 
-    Page<OrderEntity> findByCustomerIdAndCreatedAtBetween(UUID customerId, Instant from, Instant to, Pageable pageable);
+    Page<OrderEntity> findByCustomer_IdAndCreatedAtBetween(UUID customerId, Instant from, Instant to, Pageable pageable);
 
-    Page<OrderEntity> findByCustomerIdAndCreatedAtBetweenAndStatus(
+    Page<OrderEntity> findByCustomer_IdAndCreatedAtBetweenAndStatus(
             UUID customerId, Instant from, Instant to, OrderStatus status, Pageable pageable);
 
-    Page<OrderEntity> findByCustomerIdAndCreatedAtBetweenAndAssetName(
+    Page<OrderEntity> findByCustomer_IdAndCreatedAtBetweenAndAssetName(
             UUID customerId, Instant from, Instant to, String assetName, Pageable pageable);
 
-    Page<OrderEntity> findByCustomerIdAndCreatedAtBetweenAndStatusAndAssetName(
+    Page<OrderEntity> findByCustomer_IdAndCreatedAtBetweenAndStatusAndAssetName(
             UUID customerId, Instant from, Instant to, OrderStatus status, String assetName, Pageable pageable);
 
 

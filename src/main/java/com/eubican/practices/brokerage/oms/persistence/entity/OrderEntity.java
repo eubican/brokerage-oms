@@ -18,8 +18,10 @@ public class OrderEntity {
     @Column(name = "id", nullable = false, columnDefinition = "UUID")
     private UUID id;
 
-    @Column(name = "customer_id", nullable = false, columnDefinition = "UUID")
-    private UUID customerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_orders_customer"))
+    private CustomerEntity customer;
 
     @Column(name = "asset_name", nullable = false, length = 32)
     private String assetName;

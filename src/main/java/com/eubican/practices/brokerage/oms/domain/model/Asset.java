@@ -48,7 +48,7 @@ public final class Asset {
     public static Asset from(AssetEntity entity) {
         return new Asset(
                 entity.getId(),
-                entity.getCustomerId(),
+                entity.getCustomer().getId(),
                 entity.getAssetName(),
                 entity.getSize(),
                 entity.getUsable(),

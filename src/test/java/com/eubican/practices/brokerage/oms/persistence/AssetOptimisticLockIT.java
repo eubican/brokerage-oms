@@ -2,6 +2,7 @@ package com.eubican.practices.brokerage.oms.persistence;
 
 import com.eubican.practices.brokerage.oms.OmsApplication;
 import com.eubican.practices.brokerage.oms.persistence.entity.AssetEntity;
+import com.eubican.practices.brokerage.oms.persistence.entity.CustomerEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.OptimisticLockException;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.UUID;
 
 @SpringBootTest(classes = OmsApplication.class)
@@ -26,6 +28,7 @@ class AssetOptimisticLockIT {
         final UUID customerId = UUID.randomUUID();
         final String assetName = "TRY";
 
+        seedCustomer(customerId);
         seedAsset(customerId, assetName, scale4("1000.0000"), scale4("0"));
 
         EntityManager em1 = emf.createEntityManager();
@@ -59,6 +62,7 @@ class AssetOptimisticLockIT {
         final String cash = "TRY";
         final String share = "XYZ";
 
+        seedCustomer(customerId);
         seedAsset(customerId, cash, scale4("500.0000"), scale4("0"));
         seedAsset(customerId, share, scale6("100.000000"), scale6("0"));
 
@@ -102,12 +106,26 @@ class AssetOptimisticLockIT {
         withEm(em -> {
             em.getTransaction().begin();
             AssetEntity a = new AssetEntity();
-            a.setCustomerId(customerId);
             a.setAssetName(assetName);
             a.setUsable(usable);
             a.setReserved(reserved);
             a.setSize(usable.add(reserved));
+            a.setCustomer(em.getReference(CustomerEntity.class, customerId));
             em.persist(a);
+            em.getTransaction().commit();
+        });
+    }
+
+    private void seedCustomer(UUID customerId) {
+        withEm(em -> {
+            em.getTransaction().begin();
+            CustomerEntity c = new CustomerEntity();
+            c.setId(customerId);
+            c.setEmail(customerId.toString() + "@test.local");
+            c.setRole("ROLE_CUSTOMER");
+            c.setPassword("dummy-hash");
+            c.setCreatedAt(Instant.now());
+            em.persist(c);
             em.getTransaction().commit();
         });
     }
@@ -115,7 +133,7 @@ class AssetOptimisticLockIT {
     private AssetEntity findAsset(EntityManager em, UUID customerId, String assetName) {
         return em.createQuery("""
                             select a from AssetEntity a
-                             where a.customerId = :cid and a.assetName = :an
+                             where a.customer.id = :cid and a.assetName = :an
                         """, AssetEntity.class)
                 .setParameter("cid", customerId)
                 .setParameter("an", assetName)

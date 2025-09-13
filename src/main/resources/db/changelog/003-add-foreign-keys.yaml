@@ -1,0 +1,20 @@
+# src/main/resources/db/changelog/003-add-foreign-keys.yaml
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-customer-foreign-keys
+      author: eubican
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: asset
+            baseColumnNames: customer_id
+            constraintName: fk_asset_customer
+            referencedTableName: customer
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: customer_id
+            constraintName: fk_orders_customer
+            referencedTableName: customer
+            referencedColumnNames: id
+            onDelete: RESTRICT

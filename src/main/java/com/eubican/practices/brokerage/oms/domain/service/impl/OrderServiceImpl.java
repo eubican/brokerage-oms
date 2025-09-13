@@ -8,7 +8,9 @@ import com.eubican.practices.brokerage.oms.domain.model.OrderStatus;
 import com.eubican.practices.brokerage.oms.domain.service.AssetService;
 import com.eubican.practices.brokerage.oms.domain.service.OrderService;
 import com.eubican.practices.brokerage.oms.persistence.entity.OrderEntity;
+import com.eubican.practices.brokerage.oms.persistence.entity.CustomerEntity;
 import com.eubican.practices.brokerage.oms.persistence.repository.OrderJpaRepository;
+import com.eubican.practices.brokerage.oms.persistence.repository.CustomerJpaRepository;
 import com.eubican.practices.brokerage.oms.security.AuthorizationGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,8 @@ class OrderServiceImpl implements OrderService {
     private final AssetService assetService;
 
     private final AuthorizationGuard authorizationGuard;
+
+    private final CustomerJpaRepository customerRepository;
 
     @Override
     @Transactional
@@ -71,7 +75,8 @@ class OrderServiceImpl implements OrderService {
 
         OrderEntity entity = new OrderEntity();
         entity.setId(order.getId());
-        entity.setCustomerId(order.getCustomerId());
+        CustomerEntity ref = customerRepository.getReferenceById(order.getCustomerId());
+        entity.setCustomer(ref);
         entity.setAssetName(order.getAssetName());
         entity.setSide(order.getSide());
         entity.setSize(order.getSize());
@@ -95,7 +100,7 @@ class OrderServiceImpl implements OrderService {
                 });
 
         // Enforce authorization: only admin or owner can cancel
-        authorizationGuard.checkCustomerAccess(entity.getCustomerId());
+        authorizationGuard.checkCustomerAccess(entity.getCustomer().getId());
 
         if (OrderStatus.PENDING != entity.getStatus()) {
             log.warn("Order {} cannot be canceled because it is in status {}", orderID, entity.getStatus());
@@ -105,10 +110,10 @@ class OrderServiceImpl implements OrderService {
         retrying(() -> {
             if (OrderSide.BUY == entity.getSide()) {
                 BigDecimal amountTRY = entity.getPrice().multiply(entity.getSize());
-                Asset cash = assetService.retrieveCustomerAsset(entity.getCustomerId(), "TRY");
+                Asset cash = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), "TRY");
 
                 if (cash.verifyReserved(amountTRY)) {
-                    log.warn("Inconsistent TRY reserved balance to cancel BUY for customer {}", entity.getCustomerId());
+                    log.warn("Inconsistent TRY reserved balance to cancel BUY for customer {}", entity.getCustomer().getId());
                     throw new IllegalArgumentException("Inconsistent TRY reserved balance to cancel BUY");
                 }
 
@@ -116,10 +121,10 @@ class OrderServiceImpl implements OrderService {
                 cash.setUsable(cash.getUsable().add(amountTRY));
                 assetService.upsertAsset(cash);
             } else {
-                Asset asset = assetService.retrieveCustomerAsset(entity.getCustomerId(), entity.getAssetName());
+                Asset asset = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
 
                 if (asset.verifyReserved(entity.getSize())) {
-                    log.warn("Inconsistent {} reserved balance to cancel BUY for customer {}", entity.getAssetName(), entity.getCustomerId());
+                    log.warn("Inconsistent {} reserved balance to cancel BUY for customer {}", entity.getAssetName(), entity.getCustomer().getId());
                     throw new IllegalArgumentException("Inconsistent " + entity.getAssetName() + " reserved balance to cancel BUY");
                 }
 
@@ -147,12 +152,12 @@ class OrderServiceImpl implements OrderService {
         //todo a more flexible approach for future filters, we can switch the repo to JPA Specifications (single method + dynamic predicates)
         if (assetName != null && !assetName.isBlank()) {
             ordersPage = (status == null)
-                    ? orderRepository.findByCustomerIdAndCreatedAtBetweenAndAssetName(customerId, from, to, assetName, pageable)
-                    : orderRepository.findByCustomerIdAndCreatedAtBetweenAndStatusAndAssetName(customerId, from, to, status, assetName, pageable);
+                    ? orderRepository.findByCustomer_IdAndCreatedAtBetweenAndAssetName(customerId, from, to, assetName, pageable)
+                    : orderRepository.findByCustomer_IdAndCreatedAtBetweenAndStatusAndAssetName(customerId, from, to, status, assetName, pageable);
         } else {
             ordersPage = (status == null)
-                    ? orderRepository.findByCustomerIdAndCreatedAtBetween(customerId, from, to, pageable)
-                    : orderRepository.findByCustomerIdAndCreatedAtBetweenAndStatus(customerId, from, to, status, pageable);
+                    ? orderRepository.findByCustomer_IdAndCreatedAtBetween(customerId, from, to, pageable)
+                    : orderRepository.findByCustomer_IdAndCreatedAtBetweenAndStatus(customerId, from, to, status, pageable);
         }
 
         return ordersPage.map(Order::from);

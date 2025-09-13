@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public interface AssetJpaRepository extends JpaRepository<AssetEntity, UUID> {
 
-    Optional<AssetEntity> findByCustomerIdAndAssetName(UUID customerId, String assetName);
+    Optional<AssetEntity> findByCustomer_IdAndAssetName(UUID customerId, String assetName);
 
-    Page<AssetEntity> findByCustomerIdAndCreatedAtBetween(UUID customerId, Instant from, Instant to, Pageable pageable);
+    Page<AssetEntity> findByCustomer_IdAndCreatedAtBetween(UUID customerId, Instant from, Instant to, Pageable pageable);
 
 }

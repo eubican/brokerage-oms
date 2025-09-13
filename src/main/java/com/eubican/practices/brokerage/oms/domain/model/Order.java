@@ -70,7 +70,7 @@ public final class Order {
     public static Order from(OrderEntity entity) {
         return new Order(
                 entity.getId(),
-                entity.getCustomerId(),
+                entity.getCustomer().getId(),
                 entity.getAssetName(),
                 entity.getSide(),
                 entity.getSize(),
