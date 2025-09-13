@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> conflict(OptimisticLockingFailureException ex, HttpServletRequest req) {
         HttpStatus status = HttpStatus.CONFLICT;
         return ResponseEntity.status(status)
-                .body(ApiError.of(status.value(), status.getReasonPhrase(), "Concurrent update, please retry", req.getRequestURI()));
+                .body(ApiError.of(status.value(), status.getReasonPhrase(), ex.getMessage(), req.getRequestURI()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
