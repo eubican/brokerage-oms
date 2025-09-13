@@ -3,10 +3,10 @@ package com.eubican.practices.brokerage.oms.security;
 import com.eubican.practices.brokerage.oms.domain.exception.ApplicationException;
 import com.eubican.practices.brokerage.oms.domain.model.Customer;
 import com.eubican.practices.brokerage.oms.domain.service.CustomerService;
+import com.eubican.practices.brokerage.oms.security.properties.ApplicationSecurityProperties;
 import com.eubican.practices.brokerage.oms.web.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
@@ -20,7 +20,7 @@ public class TokenService {
 
     private final CustomerService customerService;
 
-    private final ApplicationSecurityProps props;
+    private final ApplicationSecurityProperties props;
 
     private final JwtEncoder jwtEncoder;
 

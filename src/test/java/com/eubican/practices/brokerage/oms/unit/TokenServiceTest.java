@@ -3,7 +3,7 @@ package com.eubican.practices.brokerage.oms.unit;
 import com.eubican.practices.brokerage.oms.domain.exception.ApplicationException;
 import com.eubican.practices.brokerage.oms.domain.model.Customer;
 import com.eubican.practices.brokerage.oms.domain.service.impl.CustomerServiceImpl;
-import com.eubican.practices.brokerage.oms.security.ApplicationSecurityProps;
+import com.eubican.practices.brokerage.oms.security.properties.ApplicationSecurityProperties;
 import com.eubican.practices.brokerage.oms.security.TokenService;
 import com.eubican.practices.brokerage.oms.web.dto.LoginRequest;
 import org.assertj.core.api.Assertions;
@@ -28,7 +28,7 @@ public class TokenServiceTest {
     private CustomerServiceImpl customerService;
 
     @Mock
-    private ApplicationSecurityProps props;
+    private ApplicationSecurityProperties props;
 
     @Mock
     private JwtEncoder jwtEncoder;
