@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AssetJpaRepository extends JpaRepository<AssetEntity, Long> {
+public interface AssetJpaRepository extends JpaRepository<AssetEntity, UUID> {
 
     Optional<AssetEntity> findByCustomerIdAndAssetName(UUID customerId, String assetName);
 
