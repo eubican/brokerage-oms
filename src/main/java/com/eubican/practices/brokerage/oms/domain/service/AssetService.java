@@ -12,6 +12,8 @@ public interface AssetService {
 
     Asset retrieveCustomerAsset(UUID customerId, String assetName);
 
+    Asset getOrCreateAsset(UUID customerId, String assetName);
+
     Page<Asset> fetchCustomerAssets(UUID customerId, Instant from, Instant to, int page, int size);
 
 }

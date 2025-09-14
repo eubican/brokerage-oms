@@ -17,7 +17,8 @@ public final class Asset {
 
     private final String assetName;
 
-    private final BigDecimal size;
+    @Setter
+    private BigDecimal size;
 
     @Setter
     private BigDecimal usable;

@@ -2,16 +2,17 @@ package com.eubican.practices.brokerage.oms.domain.service.impl;
 
 import com.eubican.practices.brokerage.oms.config.properties.OrderServiceProperties;
 import com.eubican.practices.brokerage.oms.domain.exception.OrderNotCancellableException;
+import com.eubican.practices.brokerage.oms.domain.exception.ResourceNotFoundException;
 import com.eubican.practices.brokerage.oms.domain.model.Asset;
 import com.eubican.practices.brokerage.oms.domain.model.Order;
 import com.eubican.practices.brokerage.oms.domain.model.OrderSide;
 import com.eubican.practices.brokerage.oms.domain.model.OrderStatus;
 import com.eubican.practices.brokerage.oms.domain.service.AssetService;
 import com.eubican.practices.brokerage.oms.domain.service.OrderService;
-import com.eubican.practices.brokerage.oms.persistence.entity.OrderEntity;
 import com.eubican.practices.brokerage.oms.persistence.entity.CustomerEntity;
-import com.eubican.practices.brokerage.oms.persistence.repository.OrderJpaRepository;
+import com.eubican.practices.brokerage.oms.persistence.entity.OrderEntity;
 import com.eubican.practices.brokerage.oms.persistence.repository.CustomerJpaRepository;
+import com.eubican.practices.brokerage.oms.persistence.repository.OrderJpaRepository;
 import com.eubican.practices.brokerage.oms.persistence.repository.helper.OrderSpecifications;
 import com.eubican.practices.brokerage.oms.security.AuthorizationGuard;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-
-import com.eubican.practices.brokerage.oms.domain.exception.ResourceNotFoundException;
-
 import java.util.UUID;
 
 @Slf4j
@@ -64,8 +62,8 @@ class OrderServiceImpl implements OrderService {
                 Asset asset = assetService.retrieveCustomerAsset(order.getCustomerId(), order.getAssetName());
 
                 if (asset.hasInsufficientFunds(order.getSize())) {
-                    log.warn("Insufficient {} usable balance to place BUY for customer {}", order.getAssetName(), order.getCustomerId());
-                    throw new IllegalArgumentException("Insufficient " + order.getAssetName() + " usable balance to place BUY");
+                    log.warn("Insufficient {} usable balance to place SELL for customer {}", order.getAssetName(), order.getCustomerId());
+                    throw new IllegalArgumentException("Insufficient " + order.getAssetName() + " usable balance to place SELL");
                 }
 
                 asset.setUsable(asset.getUsable().subtract(order.getSize()));
@@ -125,8 +123,8 @@ class OrderServiceImpl implements OrderService {
                 Asset asset = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
 
                 if (asset.verifyReserved(entity.getSize())) {
-                    log.warn("Inconsistent {} reserved balance to cancel BUY for customer {}", entity.getAssetName(), entity.getCustomer().getId());
-                    throw new IllegalArgumentException("Inconsistent " + entity.getAssetName() + " reserved balance to cancel BUY");
+                    log.warn("Inconsistent {} reserved balance to cancel SELL for customer {}", entity.getAssetName(), entity.getCustomer().getId());
+                    throw new IllegalArgumentException("Inconsistent " + entity.getAssetName() + " reserved balance to cancel SELL");
                 }
 
                 asset.setReserved(asset.getReserved().subtract(entity.getSize()));
@@ -168,59 +166,41 @@ class OrderServiceImpl implements OrderService {
         }
 
         retrying(() -> {
-            if (OrderSide.BUY == entity.getSide()) {
-                BigDecimal amountTRY = entity.getPrice().multiply(entity.getSize());
+            UUID customerId = entity.getCustomer().getId();
+            String assetName = entity.getAssetName();
+            BigDecimal size = entity.getSize();
+            BigDecimal price = entity.getPrice();
 
-                // Deduct reserved TRY (spend the cash)
-                Asset cash = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), "TRY");
+            if (OrderSide.BUY == entity.getSide()) {
+                BigDecimal amountTRY = price.multiply(size);
+
+                Asset cash = assetService.retrieveCustomerAsset(customerId, "TRY");
                 if (cash.verifyReserved(amountTRY)) {
-                    log.warn("Inconsistent TRY reserved balance to match BUY for customer {}", entity.getCustomer().getId());
+                    log.warn("Inconsistent TRY reserved balance to match BUY for customer {}", customerId);
                     throw new IllegalArgumentException("Inconsistent TRY reserved balance to match BUY");
                 }
                 cash.setReserved(cash.getReserved().subtract(amountTRY));
                 assetService.upsertAsset(cash);
 
-                // Credit bought asset as usable
-                try {
-                    Asset bought = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
-                    bought.setUsable(bought.getUsable().add(entity.getSize()));
-                    assetService.upsertAsset(bought);
-                } catch (ResourceNotFoundException rnfe) {
-                    Asset newAsset = Asset.from(
-                            entity.getCustomer().getId(),
-                            entity.getAssetName(),
-                            entity.getSize(),
-                            entity.getSize(),
-                            BigDecimal.ZERO
-                    );
-                    assetService.upsertAsset(newAsset);
+                Asset bought = assetService.getOrCreateAsset(customerId, assetName);
+                bought.setUsable(bought.getUsable().add(size));
+                bought.setSize(bought.getUsable().add(bought.getReserved()));
+                assetService.upsertAsset(bought);
+
+            } else {
+                Asset sold = assetService.retrieveCustomerAsset(customerId, assetName);
+                if (sold.verifyReserved(size)) {
+                    log.warn("Inconsistent {} reserved balance to match SELL for customer {}", assetName, customerId);
+                    throw new IllegalArgumentException("Inconsistent " + assetName + " reserved balance to match SELL");
                 }
-            } else { // SELL
-                // Deduct reserved units of the sold asset
-                Asset sold = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), entity.getAssetName());
-                if (sold.verifyReserved(entity.getSize())) {
-                    log.warn("Inconsistent {} reserved balance to match SELL for customer {}", entity.getAssetName(), entity.getCustomer().getId());
-                    throw new IllegalArgumentException("Inconsistent " + entity.getAssetName() + " reserved balance to match SELL");
-                }
-                sold.setReserved(sold.getReserved().subtract(entity.getSize()));
+                sold.setReserved(sold.getReserved().subtract(size));
                 assetService.upsertAsset(sold);
 
-                // Credit TRY as usable
-                BigDecimal amountTRY = entity.getPrice().multiply(entity.getSize());
-                try {
-                    Asset cash = assetService.retrieveCustomerAsset(entity.getCustomer().getId(), "TRY");
-                    cash.setUsable(cash.getUsable().add(amountTRY));
-                    assetService.upsertAsset(cash);
-                } catch (ResourceNotFoundException rnfe) {
-                    Asset newCash = Asset.from(
-                            entity.getCustomer().getId(),
-                            "TRY",
-                            amountTRY,
-                            amountTRY,
-                            BigDecimal.ZERO
-                    );
-                    assetService.upsertAsset(newCash);
-                }
+                BigDecimal amountTRY = price.multiply(size);
+                Asset cash = assetService.getOrCreateAsset(customerId, "TRY");
+                cash.setUsable(cash.getUsable().add(amountTRY));
+                cash.setSize(cash.getUsable().add(cash.getReserved()));
+                assetService.upsertAsset(cash);
             }
         });
 
@@ -248,5 +228,4 @@ class OrderServiceImpl implements OrderService {
         }
         throw last;
     }
-
 }

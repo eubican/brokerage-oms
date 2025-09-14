@@ -22,7 +22,7 @@ public class AdminOrderController {
 
     @PreAuthorize("@authorizationGuard.isAdmin(authentication)")
     @PostMapping("/{orderId}/match")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void matchOrder(@PathVariable UUID orderId) {
         orderService.matchOrder(orderId);
     }

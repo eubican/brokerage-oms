@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -56,6 +57,14 @@ class AssetServiceImpl implements AssetService {
                     log.warn("Asset {} not found for customer {}", assetName, customerId);
                     return new ResourceNotFoundException(assetName + " asset not found");
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public Asset getOrCreateAsset(UUID customerId, String assetName) {
+        return assetRepository.findByCustomer_IdAndAssetName(customerId, assetName)
+                .map(Asset::from)
+                .orElseGet(() -> Asset.from(customerId, assetName,
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
     }
 
     @Override
