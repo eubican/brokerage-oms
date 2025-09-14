@@ -27,7 +27,6 @@ public final class Order {
 
     private final Instant createdAt;
 
-    //todo can we use annotations?
     private Order(UUID id,
                   UUID customerId,
                   String assetName,

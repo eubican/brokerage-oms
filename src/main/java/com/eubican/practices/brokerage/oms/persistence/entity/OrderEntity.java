@@ -40,7 +40,6 @@ public class OrderEntity {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    //todo we should use epoch long
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

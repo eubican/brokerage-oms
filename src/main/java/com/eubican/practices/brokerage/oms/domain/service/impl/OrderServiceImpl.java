@@ -12,6 +12,7 @@ import com.eubican.practices.brokerage.oms.persistence.entity.OrderEntity;
 import com.eubican.practices.brokerage.oms.persistence.entity.CustomerEntity;
 import com.eubican.practices.brokerage.oms.persistence.repository.OrderJpaRepository;
 import com.eubican.practices.brokerage.oms.persistence.repository.CustomerJpaRepository;
+import com.eubican.practices.brokerage.oms.persistence.repository.helper.OrderSpecifications;
 import com.eubican.practices.brokerage.oms.security.AuthorizationGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -147,20 +148,9 @@ class OrderServiceImpl implements OrderService {
                                    String assetName,
                                    Pageable pageable
     ) {
-        Page<OrderEntity> ordersPage;
-
-        //todo a more flexible approach for future filters, we can switch the repo to JPA Specifications (single method + dynamic predicates)
-        if (assetName != null && !assetName.isBlank()) {
-            ordersPage = (status == null)
-                    ? orderRepository.findByCustomer_IdAndCreatedAtBetweenAndAssetName(customerId, from, to, assetName, pageable)
-                    : orderRepository.findByCustomer_IdAndCreatedAtBetweenAndStatusAndAssetName(customerId, from, to, status, assetName, pageable);
-        } else {
-            ordersPage = (status == null)
-                    ? orderRepository.findByCustomer_IdAndCreatedAtBetween(customerId, from, to, pageable)
-                    : orderRepository.findByCustomer_IdAndCreatedAtBetweenAndStatus(customerId, from, to, status, pageable);
-        }
-
-        return ordersPage.map(Order::from);
+        var spec = OrderSpecifications.byFilters(customerId, from, to, status, assetName);
+        Page<OrderEntity> page = orderRepository.findAll(spec, pageable);
+        return page.map(Order::from);
     }
 
     @Override

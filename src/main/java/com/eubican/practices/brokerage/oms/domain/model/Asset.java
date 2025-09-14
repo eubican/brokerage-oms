@@ -25,7 +25,6 @@ public final class Asset {
     @Setter
     private BigDecimal reserved;
 
-    //todo can we use annotations?
     private Asset(UUID id,
                   UUID customerId,
                   String assetName,
