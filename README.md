@@ -36,33 +36,6 @@ The application jar will be at: _**build/libs/oms-0.0.1-SNAPSHOT.jar**_
 
 ---
 
-## Run locally (without Docker)
-
-Set the required security environment variables, then run the app.
-
-**Windows PowerShell:**
-
-```powershell
-$env:APPLICATION_SECURITY_ADMIN_USER="admin"; `
-$env:APPLICATION_SECURITY_ADMIN_PASSWORD="admin"; `
-$env:APPLICATION_SECURITY_JWT_SECRET="please-change-me-32-bytes-or-more"; `
-./gradlew.bat bootRun
-```
-
-**macOS/Linux:**
-
-```bash
-APPLICATION_SECURITY_ADMIN_USER=admin APPLICATION_SECURITY_ADMIN_PASSWORD=admin APPLICATION_SECURITY_JWT_SECRET=please-change-me-32-bytes-or-more ./gradlew bootRun
-```
-
-After startup, check health:
-
-```
-http://localhost:8080/actuator/health
-```
-
----
-
 ## Run with Docker
 
 **Build an image:**
