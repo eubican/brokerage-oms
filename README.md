@@ -8,11 +8,6 @@ This project exposes a small Orders API. For ready-to-run HTTP requests, import 
 ### Notes
 
 - Configure Postman variables `baseUrl` (default `http://localhost:8080`), `username`, `password`.
-- For `GET /api/v1/orders`, required query params: `customerId`, `from`, `to` (ISO-8601, e.g., `2025-01-01T00:00:00Z`).
-- Sorting: use `sort=property[,ASC|DESC]`.  
-  Allowed properties: `createdAt` (alias `created_at`), `price`, `size`, `status`, `assetName` (alias `asset_name`).  
-  Default: `createdAt,DESC`.
-- Actuator health endpoint (`/actuator/health`) is public.
 
 ---
 
