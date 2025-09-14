@@ -60,7 +60,7 @@ class SecuritySmokeIT {
     }
 
     @Test
-    void apiWithWrongAutIsUnauthorized() {
+    void apiWithWrongAuthIsUnauthorized() {
         TestRestTemplate wrongUser = restTemplate.withBasicAuth("wrong", "creds");
         String url = baseUrl("/api/v1/orders?customerId=" + UUID.randomUUID() +
                 "&from=" + Instant.now().minusSeconds(3600).toString() +
