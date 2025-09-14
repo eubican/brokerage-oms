@@ -202,7 +202,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base-url}}/api/v1/assets?customerId={{customer-id}}&from=2025-09-12T00:00:00.000Z&to=2025-09-13T00:00:00.000Z&sort=createdAt,DESC",
+					"raw": "{{base-url}}/api/v1/assets?customerId={{customer-id}}&from=2025-09-01T00:00:00.000Z&to=2025-10-01T00:00:00.000Z&sort=createdAt,DESC",
 					"host": [
 						"{{base-url}}"
 					],
@@ -218,11 +218,11 @@
 						},
 						{
 							"key": "from",
-							"value": "2025-09-12T00:00:00.000Z"
+							"value": "2025-09-01T00:00:00.000Z"
 						},
 						{
 							"key": "to",
-							"value": "2025-09-13T00:00:00.000Z"
+							"value": "2025-10-01T00:00:00.000Z"
 						},
 						{
 							"key": "sort",
@@ -264,6 +264,38 @@
 							"key": "customerId",
 							"value": "{{customer-id}}"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Match Order (admin)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/api/v1/admin/orders/{{order-id}}/match",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"admin",
+						"orders",
+						"{{order-id}}",
+						"match"
 					]
 				}
 			},
