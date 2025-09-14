@@ -1,5 +1,8 @@
 # Brokerage OMS - Quick Start
 
+[![Coverage](https://codecov.io/gh/OWNER/REPO/branch/main/graph/badge.svg)](https://app.codecov.io/gh/OWNER/REPO)
+
+
 This project exposes a small Orders API. For ready-to-run HTTP requests, import the Postman collection:
 `docs/postman/OMS.postman_collection.json`
 
